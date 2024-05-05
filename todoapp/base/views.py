@@ -7,12 +7,6 @@ from datetime import date
 def home(request):
     return render(request,"home.html")
 
-def login(request):
-    return render(request,"login.html")
-
-def signup(request):
-    return render(request,"signup.html")
-
 def updatepage(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
     return render(request, "update.html",{'task':task})
