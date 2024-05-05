@@ -1,0 +1,15 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<h1> Update Page </h1>
+
+<form method="POST" action="/update/{{task.id}}/">
+    {% csrf_token %}
+    <div class="input-group">
+        <input type="text" class="form-control" name="task_name" placeholder="{{ task.contents }}">
+        <input type="date" class="form-control" name="task_date" placeholder="{{ task.deadline }}">
+        <button type="submit" class="btn btn-outline-secondary">update Task</button>
+    </div>
+</form>
+
+{% endblock %}

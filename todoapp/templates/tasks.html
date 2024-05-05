@@ -1,5 +1,122 @@
 {% extends 'main.html' %}
 
 {% block content %}
-<h1>Tasks</h1>
+<div class = "container">
+    {% if tasks < 1 %}
+    <div class="card">
+        <div class="card-body">
+            There are no tasks. Create one below
+        </div>
+      </div>
+
+    {% else %}
+
+    <div class="container">
+        <div class="row">
+            <h1> Pending </h1>
+            <div class="col">
+                
+    <table class="table">
+        <tr>
+            <th>Task</th>
+            <th>Deadline</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        {% for task in pending_tasks %}
+            <tr>
+                <td>{{ task.contents }}</td>
+                <td>{{ task.deadline }}</td>
+                <td> 
+                    <a href="/completed/{{task.id}}" class="btn btn-outline-secondary">Completed</a>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <a href="/delete/{{task.id}}" class="btn btn-outline-secondary">Delete</a>
+                        <br>
+                        <a href="/update_page/{{ task.id }}" class="btn btn-outline-secondary">Update</a>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+   
+
+            </div>
+        </div>
+        <div class="row">
+            <h1> Completed </h1>
+            <div class="col">
+                
+    <table class="table">
+        <tr>
+            <th>Task</th>
+            <th>Deadline</th>
+            <th>Actions</th>
+        </tr>
+        {% for task in completed_tasks %}
+            <tr>
+                <td>{{ task.contents }}</td>
+                <td>{{ task.deadline }}</td>
+                <td>
+                    <div class="input-group">
+                        <a href="/delete/{{task.id}}" class="btn btn-outline-secondary">Delete</a>
+                        <br>
+                        <a href="/update_page/{{ task.id }}" class="btn btn-outline-secondary">Update</a>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+   
+
+            </div>
+        </div>
+        <div class="row">
+            <h1> Expired </h1>
+            <div class="col">
+                
+    <table class="table">
+        <tr>
+            <th>Task</th>
+            <th>Deadline</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        {% for task in expired_tasks %}
+            <tr>
+                <td>{{ task.contents }}</td>
+                <td>{{ task.deadline }}</td>
+                <td> 
+                    <a href="/completed/{{task.id}}" class="btn btn-outline-secondary">Completed</a>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <a href="/delete/{{task.id}}" class="btn btn-outline-secondary">Delete</a>
+                        <br>
+                        <a href="/update_page/{{ task.id }}" class="btn btn-outline-secondary">Update</a>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+ 
+
+            </div>
+        </div>
+    </div>
+    {% endif %}  
+
+    <form method="POST" action="/add_task/">
+        {% csrf_token %}
+        <div class="input-group">
+            <input type="text" class="form-control" name="task_name" placeholder="Task">
+            <input type="date" class="form-control" name="task_date" placeholder="Date">
+            <button type="submit" class="btn btn-outline-secondary">Add Task</button>
+        </div>
+    </form>
+    
+    
+    
+</div>
 {% endblock %}
