@@ -2,8 +2,8 @@
 
 {% block content %}
 <div class="container">
-    <h1>Sign up</h1>
-    <form method="POST" action="register">
+    <h1>Login</h1>
+    <form method="POST" action="{% url 'login' %}">
         {% csrf_token %}
         <div class="mb-3">
             <label for="username" class="form-label">Username</label>
@@ -13,7 +13,7 @@
             <label for="password" class="form-label">Password</label>
             <input type="password" class="form-control" id="password" name="password" required>
         </div>
-        <button type="submit" class="btn btn-outline-secondary">Sign Up</button>
+        <button type="submit" class="btn btn-outline-secondary">Login</button>
     </form>
     <br>
 
@@ -25,4 +25,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}

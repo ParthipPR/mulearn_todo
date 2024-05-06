@@ -13,9 +13,11 @@ def updatepage(request, task_id):
 
 def tasks(request):
     today = date.today()
-    pending_tasks = Task.objects.filter(completed=False, deadline__gte=today)
-    completed_tasks = Task.objects.filter(completed=True)
-    expired_tasks = Task.objects.filter(completed=False, deadline__lt=today)
+    user = request.user
+    
+    pending_tasks = Task.objects.filter(user=user, completed=False, deadline__gte=today)
+    completed_tasks = Task.objects.filter(user=user, completed=True)
+    expired_tasks = Task.objects.filter(user=user, completed=False, deadline__lt=today)
 
     tasks_count = pending_tasks.count() + completed_tasks.count() + expired_tasks.count()
 
@@ -23,7 +25,7 @@ def tasks(request):
         'pending_tasks': pending_tasks,
         'completed_tasks': completed_tasks,
         'expired_tasks': expired_tasks,
-        'tasks':tasks_count
+        'tasks': tasks_count
     })
 
 def completed(request, task_id):
@@ -43,7 +45,7 @@ def add_task(request):
         task_name = request.POST.get('task_name')
         task_date = request.POST.get('task_date')
 
-        user = get_object_or_404(User,pk=1)
+        user = request.user
         task = Task.objects.create(
             contents=task_name,
             deadline=task_date,
