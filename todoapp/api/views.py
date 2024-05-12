@@ -1,5 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
+from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -8,33 +10,40 @@ from base.models import Task
 from .serializers import TaskSerializer
 from datetime import date
 
-@api_view(['GET'])
-def updatepage(request, task_id):
-    task = get_object_or_404(Task, pk=task_id)
-    serializer = TaskSerializer(task)
-    return Response(serializer.data)
+class Updatepage(APIView):
+    def get(self,request, task_id):
+        task = get_object_or_404(Task, pk=task_id)
+        serializer = TaskSerializer(task)
+        return Response(serializer.data)
 
-@api_view(['GET'])
-def tasks(request):
-    today = date.today()
-    user = request.user
-    
-    pending_tasks = Task.objects.filter(user=user, completed=False, deadline__gte=today)
-    completed_tasks = Task.objects.filter(user=user, completed=True)
-    expired_tasks = Task.objects.filter(user=user, completed=False, deadline__lt=today)
+class Tasks(APIView):
+    def get(self,request):
+        today = date.today()
+        user = request.user
 
-    tasks_count = pending_tasks.count() + completed_tasks.count() + expired_tasks.count()
+        pending_tasks = Task.objects.filter(user=user, completed=False, deadline__gte=today)
+        completed_tasks = Task.objects.filter(user=user, completed=True)
+        expired_tasks = Task.objects.filter(user=user, completed=False, deadline__lt=today)
 
-    pending_serializer = TaskSerializer(pending_tasks, many=True)
-    completed_serializer = TaskSerializer(completed_tasks, many=True)
-    expired_serializer = TaskSerializer(expired_tasks, many=True)
+        tasks_count = pending_tasks.count() + completed_tasks.count() + expired_tasks.count()
 
-    return Response({
-        'pending_tasks': pending_serializer.data,
-        'completed_tasks': completed_serializer.data,
-        'expired_tasks': expired_serializer.data,
-        'tasks': tasks_count
-    })
+        pending_serializer = TaskSerializer(pending_tasks, many=True)
+        completed_serializer = TaskSerializer(completed_tasks, many=True)
+        expired_serializer = TaskSerializer(expired_tasks, many=True)
+
+        return Response({
+            'pending_tasks': pending_serializer.data,
+            'completed_tasks': completed_serializer.data,
+            'expired_tasks': expired_serializer.data,
+            'tasks': tasks_count
+        })
+
+    def post(self,request):
+        serializer = TaskSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def completed(request, task_id):
@@ -49,13 +58,6 @@ def delete(request, task_id):
     task_instance.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-@api_view(['POST'])
-def add_task(request):
-    serializer = TaskSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save(user=request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PUT'])
 def update(request, task_id):
